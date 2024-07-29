@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "../dist/cli",
+    "rootDir": ".",
+    "module": "ESNext",
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "moduleResolution": "Node"
+  },
+  "include": ["index.ts", "src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
