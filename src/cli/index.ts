@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-"use strict"
-
 import { AppState } from "./src/state";
-import { fetchConfig } from "./src/util";
+import { dumpState, fetchConfig } from "./src/util";
+import { build as viteBuild } from "vite";
 
 import { Command } from 'commander';
+import path from "path";
 const program = new Command();
 
-program 
+program
     .name('docuflow')
     .description('A CLI for generating modern, beautiful documentation.')
     .version('0.0.1')
@@ -31,4 +31,20 @@ if (invokedCommand === 'build') {
     const state = new AppState(configPath, configData);
 
     await state.resolveModules();
+
+    // For lack of better things to do, we're going to store the state in a json file in our dist 
+    // output. This is so that:
+    // (1) the user can see the state of the application's structure,
+    // (2) the end user can parse the website's structure, and
+    // (3) the user can debug the application easily.
+    await dumpState(state);
+
+    // Now we can build the documentation using Vite.
+    await viteBuild({
+        root: "src/website",
+        build: {
+            outDir: path.join(process.cwd(), state.outDir),
+        }
+    })
+
 }

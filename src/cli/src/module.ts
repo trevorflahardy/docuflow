@@ -42,7 +42,7 @@ export class Module {
         if (settings) {
             this.settings = settings;
         }
-        
+
         if (files) {
             this.files = files;
         }
@@ -86,7 +86,7 @@ export class Module {
         try {
             // (2) Import it
             const settings = await import(settingsPath);
-            
+
             // (3) Set the settings
             this.settings = settings;
             return settings;
@@ -99,9 +99,8 @@ export class Module {
     /// Gets all the sub-modules that are in this module's directory and adds them
     /// to this module.
     private async resolveSubModules(): Promise<Module[]> {
-        console.log('Resolving submodules in', this.path, this.name);
         const modules: Module[] = [];
-        
+
         // Grab all directories in the module's directory
         const directories = await glob(path.join(this.path, "*/"), { absolute: true });
         for (const dir of directories) {
@@ -117,7 +116,6 @@ export class Module {
 
     /// Gets all the files in this module's directory and adds them to this module.
     private async resolveFiles(docFileGlobs: string[]): Promise<string[]> {
-        console.log('Resolving files in', this.path, this.name);
         let files: string[] = [];
         for (const docFileGlob of docFileGlobs) {
             // Grab all the files that match the glob
@@ -143,5 +141,7 @@ export class Module {
         for (const child of this.modules) {
             await child.resolve(docFileGlobs);
         }
+
+        console.log('Resolved module:', this.name);
     }
 } 
