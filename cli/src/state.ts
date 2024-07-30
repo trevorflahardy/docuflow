@@ -50,8 +50,8 @@ export class AppState {
     async resolveModules(): Promise<void> {
         // Create the main module
         this.module = new Module(this.name, this.docsPath);
-        await this.module.resolve(this.docFileGlobs);
 
-        console.log('Mapping:', JSON.stringify(this.module))
+        // And resolve the entire module tree.
+        await this.module.resolve(this.docFileGlobs);
     }
 }
