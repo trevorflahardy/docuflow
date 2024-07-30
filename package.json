@@ -9,7 +9,7 @@
   "main": "./dist/cli/index.js",
   "scripts": {
     "dev": "vite ./website",
-    "build": "tsc -b cli --verbose && tsc-alias -p ./cli/tsconfig.json --verbose --resolve-full-paths && vite build ./website",
+    "build": "tsc -b src/cli --verbose && tsc-alias -p ./src/cli/tsconfig.json --verbose --resolve-full-paths && vite build ./src/website",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview ./website"
   },
