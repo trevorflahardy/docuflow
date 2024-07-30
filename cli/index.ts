@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict"
 
-import { Configuration } from "./src/config";
+import { AppState } from "./src/state";
 import { fetchConfig } from "./src/util";
 
 import { Command } from 'commander';
@@ -28,6 +28,7 @@ if (invokedCommand === 'build') {
 
     const configPath = buildOptions.config;
     const configData = await fetchConfig(configPath);
-    const config = new Configuration(configPath, configData);
-    console.log('Configuration:', config);
+    const state = new AppState(configPath, configData);
+
+    await state.parseModules();
 }
