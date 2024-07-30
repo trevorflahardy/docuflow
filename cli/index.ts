@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 "use strict"
 
+import { Configuration } from "./src/config";
+import { fetchConfig } from "./src/util";
+
 import { Command } from 'commander';
 const program = new Command();
 
@@ -10,13 +13,21 @@ program
     .version('0.0.1')
 
 // Denotes the command that actually builds the documentation.
-program.command('build')
+const build = program.command('build')
     .description('Build the documentation from the provided configuration.')
-    .argument('[docs]', 'The path to the MDX files to build. Defaults to the `./docs` directory.', './docs')
-    .option('-o, --output <output>', 'The path to the output directory.', './dist')
-    .option('-c, --config <config>', 'The path to the configuration file.', './docuflow.config.js')
+    .option('-c, --config <path>', 'Path to the configuration file.', './docuflow.config.js')
 
+// Parses the command line arguments.
 program.parse(process.argv);
 
-const options = program.opts();
-console.log(options);
+const invokedCommand = program.args[0];
+
+// If the user has invoked the "build" command, the first argument will be "build".
+if (invokedCommand === 'build') {
+    const buildOptions = build.opts();
+
+    const configPath = buildOptions.config;
+    const configData = await fetchConfig(configPath);
+    const config = new Configuration(configPath, configData);
+    console.log('Configuration:', config);
+}
