@@ -9,5 +9,5 @@ export default interface Config {
     /// in the documentation. The glob will be evaluated in the current
     /// `docsPath` directory. Will default to["./**/*.{mdx, md}"] if not provided.
     /// A majority of the time, you will not need to change this.
-    docFileGlob?: string[];
+    docFileGlobs?: string[];
 }

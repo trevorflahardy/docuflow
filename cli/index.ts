@@ -30,5 +30,5 @@ if (invokedCommand === 'build') {
     const configData = await fetchConfig(configPath);
     const state = new AppState(configPath, configData);
 
-    await state.parseModules();
+    await state.resolveModules();
 }
