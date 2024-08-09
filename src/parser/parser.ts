@@ -96,20 +96,13 @@ export class Parser {
         let italic = new Italic([]);
         let currentText = new Text([]);
 
+        // Consume the star token at the beginning
+        this.consume();
+
         // While the current token is not a star, consume the token and add it to
         // the current text.
         while (this.currentToken() && this.currentToken()!.type !== TokenType.STAR_IDENTIFIER) {
             const next = this.consume()!;
-
-            // If this is a new line, we need to create a new text object and
-            // continue parsing.
-            if (next.type === TokenType.NEW_LINE) {
-                italic.nodes.push(currentText);
-                currentText = new Text([]);
-                continue;
-            }
-
-            // Otherwise, add the token to the current text
             currentText.tokens.push(next);
         }
 
@@ -140,12 +133,10 @@ export class Parser {
         let header = new Heading([], level);
         let currentText = new Text([]);
         while (this.currentToken() && this.currentToken()!.type !== TokenType.NEW_LINE) {
-            const next = this.consume()!;
-
             // TODO: If this is some italic identifier, append the currentText to
             // TODO: header, parse new italic object, and then create a new currentText
             // TODO: object.
-            if (next.type === TokenType.STAR_IDENTIFIER && this.peek() && this.peek()!.type === TokenType.CHAR) {
+            if (this.currentToken()!.type === TokenType.STAR_IDENTIFIER && this.peek() && this.peek()!.type === TokenType.CHAR) {
                 header.nodes.push(currentText);
                 currentText = new Text([]);
                 const italic = this.parseItalic();
@@ -154,7 +145,7 @@ export class Parser {
             }
 
             // For now, just add the token to the current text
-            currentText.tokens.push(next);
+            currentText.tokens.push(this.consume()!);
         }
 
         if (currentText.length > 0) {
@@ -168,22 +159,11 @@ export class Parser {
         // If the token is a character, we need to create a paragraph node starting
         // at this token and walking until we find a new line.
         let paragraph = new Paragraph([]);
+        let currentText = new Text([]);
 
-        let currentText = new Text([this.consume()!]);
-        while (this.currentToken() && this.currentToken()!.type !== TokenType.HEADER_IDENTIFIER) {
-            const next = this.consume()!;
-
-            // If this next is a new line, we need to append the current text to
-            // the paragraph and create a new text object to continue.
-            if (next.type === TokenType.NEW_LINE) {
-                if (currentText.length > 0) {
-                    paragraph.nodes.push(currentText);
-                }
-
-                currentText = new Text([]);
-                continue;
-            }
-            else if (next.type === TokenType.STAR_IDENTIFIER && this.peek() && this.peek()!.type === TokenType.CHAR) {
+        while (this.currentToken() && this.currentToken()!.type !== TokenType.HEADER_IDENTIFIER && this.currentToken()!.type !== TokenType.NEW_LINE) {
+            // If this token is a star and the next is a char, this is an italic
+            if (this.currentToken()!.type === TokenType.STAR_IDENTIFIER && this.peek() && this.peek()!.type === TokenType.CHAR) {
                 if (currentText.length > 0) {
                     paragraph.nodes.push(currentText);
                 }
@@ -195,7 +175,7 @@ export class Parser {
             }
             else {
                 // This is a normal character, so we can append it to the current text
-                currentText.tokens.push(next);
+                currentText.tokens.push(this.consume()!);
             }
         }
 

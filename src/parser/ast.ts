@@ -5,7 +5,6 @@ export interface Node {
      * Converts the node to HTML.
      */
     toHTML(): string;
-
 }
 
 /**
@@ -44,9 +43,8 @@ export class Paragraph implements Node {
     }
 
     toHTML(): string {
-        // Every node in this paragraph should be wrapped in a <p> tag.
-        // So for N nodes we have N <p> tags.
-        return this.nodes.map(node => `<p>${node.toHTML()}</p>`).join("\n");
+        // Join the nodes together and wrap them in a <p> tag
+        return `<p>${this.nodes.map(node => node.toHTML()).join("")}</p>`;
     }
 }
 
