@@ -15,15 +15,9 @@ export enum TokenType {
  */
 export class Token {
     value: string;
-    line: number;
-    column: number; // The index of this token in the line
-    index: number; // The index of this token in the file
 
-    constructor(value: string, line: number, column: number, index: number) {
+    constructor(value: string) {
         this.value = value;
-        this.line = line;
-        this.column = column;
-        this.index = index;
     }
 
     get type(): TokenType {

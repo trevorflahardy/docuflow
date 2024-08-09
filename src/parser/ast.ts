@@ -44,7 +44,7 @@ export class Paragraph implements Node {
 
     toHTML(): string {
         // Join the nodes together and wrap them in a <p> tag
-        return `<p>${this.nodes.map(node => node.toHTML()).join("")}</p>`;
+        return `<p>${this.nodes.map(node => node.toHTML()).join(" ")}</p>`;
     }
 }
 
