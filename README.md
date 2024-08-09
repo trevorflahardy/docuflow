@@ -13,7 +13,9 @@ To test the site locally, run the following command:
 ```bash
 git clone https://github.com/trevorflahardy/docuflow
 cd docuflow
-npm run build && node dist/index.js build --config ./docuflow.config.js
+npm install && npm run build
+
+# NOTE: Move the docs folder into the dist folder
 ```
 
 And then you can start a local development server for `dist/index.html` using any static server. For example, I use the VSCode extension `Live Server`.
