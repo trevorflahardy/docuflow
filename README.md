@@ -1,6 +1,6 @@
 # Docuflow
 
-Doculow is a lightweight documentation generator from markdown files. It is designed to be simple and easy to use. It is a single binary that generates a static site from markdown files.
+Docuflow is a lightweight documentation generator from markdown files. It is designed to be simple and easy to use. It is a single binary that generates a static site from markdown files.
 
 The build time of the site is very fast, as the markdown files are not parsed at build time. Instead, the markdown files are parsed at runtime, and the HTML is cached (or at least, it will be).
 
