@@ -1,6 +1,4 @@
 export default {
-    // The name of the project
-    name: 'docuflow',
-    
-    docsPath: './docs'
+  docsDir: "./docs",
+  outDir: "./dist/output"
 }
