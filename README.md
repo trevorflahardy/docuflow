@@ -16,6 +16,8 @@ cd docuflow
 npm run build && node dist/index.js build --config ./docuflow.config.js
 ```
 
+And then you can start a local development server for `dist/output/index.html` using any static server. For example, I use the VSCode extension `Live Server`.
+
 ## Development Note
 
 This side project of mine is in its infancy. I am currently working on the basic functionality of the site. This `README.md` will be updated as the project progresses.
