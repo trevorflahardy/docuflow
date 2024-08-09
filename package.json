@@ -1,26 +1,44 @@
 {
-  "name": "docuflow",
+  "name": "my-webpack-project",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "bin": {
     "docuflow": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "scripts": {
-    "build": "npm run copy-files && tsc",
-    "copy-files": "copyfiles -u 1 src/**/*.{html,css,json} dist"
+    "build": "webpack --mode=production --node-env=production",
+    "build:dev": "webpack --mode=development",
+    "build:prod": "webpack --mode=production --node-env=production",
+    "watch": "webpack --watch",
+    "serve": "webpack serve"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "8.0.1",
     "@typescript-eslint/parser": "8.0.1",
+    "@webpack-cli/generators": "^3.0.7",
     "autoprefixer": "^10.4.20",
     "commander": "12.1.0",
     "copyfiles": "^2.4.1",
+    "css-loader": "^7.1.2",
     "eslint": "9.8.0",
     "express": "^4.19.2",
     "glob": "^11.0.0",
-    "typescript": "^5.0.0"
-  }
+    "html-webpack-plugin": "^5.6.0",
+    "mini-css-extract-plugin": "^2.9.0",
+    "postcss": "^8.4.41",
+    "postcss-loader": "^8.1.1",
+    "prettier": "^3.3.3",
+    "sass": "^1.77.8",
+    "sass-loader": "^16.0.0",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.5.4",
+    "webpack": "^5.93.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
+  },
+  "description": "My webpack project"
 }

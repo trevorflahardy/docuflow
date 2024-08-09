@@ -1,4 +1,4 @@
-import { Token, TokenType } from "./tokens.js";
+import { Token } from "./tokens";
 
 export interface Node {
     /**

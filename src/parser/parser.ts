@@ -1,5 +1,5 @@
-import { Heading, Italic, Node, Paragraph, Text } from "./ast.js";
-import { TokenType, Token } from "./tokens.js";
+import { Heading, Italic, Node, Paragraph, Text } from "./ast";
+import { TokenType, Token } from "./tokens";
 
 /**
  * Represents an MD parser. This class is responsible for walking through a MD

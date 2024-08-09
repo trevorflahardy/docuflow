@@ -1,4 +1,4 @@
-import { Parser } from './parser/parser.js';
+import { Parser } from './parser';
 
 /**
  * The actual Docuflow class. Handles all the management of state, logic, and rendering of
@@ -33,6 +33,3 @@ export class Docuflow {
         }
     }
 }
-
-const docuflow = new Docuflow();
-await docuflow.inject();
