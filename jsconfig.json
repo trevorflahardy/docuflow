@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ES2022",
-    "checkJs": true,
-    "moduleResolution": "Node"
-  },
-  "include": ["src/**/*.js", "src/utils.ts", "src/index.ts", "src/docuflow.ts", "src/parser/tokens.ts", "src/parser/parser.ts", "src/parser/index.ts", "src/parser/ast.ts"],
-}
