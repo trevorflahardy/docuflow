@@ -14,6 +14,8 @@ export class Parser {
     constructor(content: string) {
         this.content = content;
         this.tokens = this.parseTokens();
+
+        console.log('EOF token:', this.content[this.content.length - 1]);
     }
 
     private parseTokens(): Array<Token> {
@@ -40,12 +42,18 @@ export class Parser {
      * Peeks at the next token in the stream without consuming it.
      * Returns NULL if there are no more tokens.
      */
-    private peek(amount: number = 1): Token | null {
-        if (this.tokens.length <= amount) {
+    private peek(forwardBy: number = 1): Token | null {
+        if (this.tokens.length == 0) {
             return null;
         }
 
-        return this.tokens[amount];
+        // If the forwardBy is out of bounds, return NULL
+        if (forwardBy >= this.tokens.length) {
+            return null;
+        }
+
+        // Return the token at the forwardBy index
+        return this.tokens[forwardBy];
     }
 
     /**
@@ -53,7 +61,7 @@ export class Parser {
      * onto the next token. Returns NULL if there are no more tokens.
      */
     private consume(): Token | null {
-        if (!this.tokens) {
+        if (this.tokens.length == 0) {
             return null;
         }
 
@@ -63,17 +71,17 @@ export class Parser {
     }
 
     private currentToken(): Token | null {
-        if (!this.tokens) {
+        if (this.tokens.length == 0) {
             return null;
         }
 
         return this.tokens[0];
     }
 
-    private currentTokenIs(...type: Array<TokenType>): boolean {
+    private currentTokenIs(...type: Array<TokenType>): boolean | null {
         const current = this.currentToken();
         if (!current) {
-            return false;
+            return null;
         }
 
         for (let i = 0; i < type.length; i++) {
@@ -85,8 +93,13 @@ export class Parser {
         return false;
     }
 
-    private currentTokenIsNot(...type: Array<TokenType>): boolean {
-        return !this.currentTokenIs(...type);
+    private currentTokenIsNot(...type: Array<TokenType>): boolean | null {
+        const currentTokenIs = this.currentTokenIs(...type);
+        if (currentTokenIs === null) {
+            return null;
+        }
+
+        return !currentTokenIs;
     }
 
     /**
@@ -112,24 +125,24 @@ export class Parser {
      * This is * not italic -> Cannot parse
      */
     private canParseItalic(): boolean {
-        // We know that the current token is a star, so we need to look ahead for
-        // the ending star.
         let ahead = 1;
+        let nextToken: Token | null;
 
-        // Continue peeking until we find another char that is not a star identifier - ie,
-        // the next peek token is a star identifier.
-        while (this.peek(ahead) && this.peek(ahead)!.type !== TokenType.STAR_IDENTIFIER) {
-            // If peeking ahead is a new line, then we can't parse an italic
-            if (this.peek(ahead)!.type === TokenType.NEW_LINE) {
+        while ((nextToken = this.peek(ahead)) !== null) {
+            // Break if we find the closing star or hit a new line
+            if (nextToken.type === TokenType.STAR_IDENTIFIER) {
+                return true;
+            }
+
+            if (nextToken.type === TokenType.NEW_LINE) {
                 return false;
             }
 
             ahead++;
         }
 
-        // If peeking ahead is NULL, then we can't parse an italic
-        // If it is, then we can parse an italic
-        return this.peek(ahead) !== null;
+        // If we exit the loop, we didn't find a closing star
+        return false;
     }
 
     /**
@@ -223,12 +236,12 @@ export class Parser {
         let paragraph = new Paragraph([]);
         let currentText = new Text([]);
 
-        while (this.currentTokenIsNot(TokenType.HEADER_IDENTIFIER)) {
+        while (this.currentTokenIsNot(TokenType.HEADER_IDENTIFIER) && this.tokens.length > 0) {
             // If this token is a new line, one of many things could happen
             if (this.currentTokenIs(TokenType.NEW_LINE)) {
                 // If this is the last token (ie nothing new to peek to), we can break out of the loop
                 let next = this.peek();
-                if (!next) {
+                if (next === null) {
                     this.consume();
                     break;
                 }
@@ -251,6 +264,7 @@ export class Parser {
                 // If nothing else, simply move onto the next character. Push this current line
                 // to the paragraph and reset the current text
                 if (currentText.length > 0) {
+                    currentText.tokens.push(new Token(" "));
                     paragraph.nodes.push(currentText);
                     currentText = new Text([]);
                 }
@@ -270,6 +284,10 @@ export class Parser {
                     }
 
                     paragraph.nodes.push(italic);
+                }
+                else {
+                    // This is not valid, so we need to treat this star as a normal character
+                    currentText.tokens.push(this.consume()!);
                 }
             }
             else {
