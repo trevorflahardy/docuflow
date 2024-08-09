@@ -2,9 +2,10 @@
  * Represents one of the many types of tokens in an MD file.
  */
 export enum TokenType {
-    HEADER,
+    HEADER_IDENTIFIER,
     CHAR,
     NEW_LINE,
+    STAR_IDENTIFIER,
 }
 
 
@@ -29,9 +30,11 @@ export class Token {
         // Determine the type of token based on its value
         switch (this.value) {
             case "#":
-                return TokenType.HEADER;
+                return TokenType.HEADER_IDENTIFIER;
             case "\n":
                 return TokenType.NEW_LINE;
+            case "*":
+                return TokenType.STAR_IDENTIFIER;
             default:
                 return TokenType.CHAR;
         }

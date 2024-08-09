@@ -1,4 +1,4 @@
-import { Heading, Node, Paragraph } from "./ast.js";
+import { Heading, Italic, Node, Paragraph, Text } from "./ast.js";
 import { TokenType, Token } from "./tokens.js";
 
 /**
@@ -84,28 +84,76 @@ export class Parser {
         return this.tokens[0];
     }
 
+    // private parseItalic(): Italic {
+    //     // Called if the current token is a star, it is not followed
+    //     // by another star (for a bold) or a space for a raw star or list of 
+    //     // some sort.
+    //     let italic = new Italic([]);
+    // 
+    //     // Consume this token to ignore the star
+    //     this.consume();
+    // 
+    //     while (this.currentToken() && this.currentToken()!.type !== TokenType.STAR_IDENTIFIER) {
+    //         const next = this.consume()!;
+    //         italic.tokens.push(next);
+    //     }
+    // 
+    //     // We know the next token is a star, so consume it
+    //     this.consume();
+    // 
+    //     // And return the italic node
+    //     return italic;
+    // }
+
     private parseHeader(): Heading {
         // If the token is a header, we need to create a header node starting
         // at this token and walking until we find a new line.
-        let header = new Heading([this.consume()!]);
+        let level = 0;
 
-        while (this.currentToken() && this.currentToken()!.type !== TokenType.NEW_LINE) {
-            const next = this.consume()!;
-            header.tokens.push(next);
+        // While we have tokens and the token is a header identifier, increment
+        // the level of the header
+        while (this.currentToken() && this.currentToken()!.type === TokenType.HEADER_IDENTIFIER) {
+            level++;
+            this.consume();
         }
 
+        let header = new Heading([], level);
+        let currentText = new Text([]);
+        while (this.currentToken() && this.currentToken()!.type !== TokenType.NEW_LINE) {
+            const next = this.consume()!;
+
+            // TODO: If this is some italic identifier, append the currentText to
+            // TODO: header, parse new italic object, and then create a new currentText
+            // TODO: object.
+
+            // For now, just add the token to the current text
+            currentText.tokens.push(next);
+        }
+
+        header.nodes.push(currentText);
         return header;
     }
 
     private parseParagraph(): Paragraph {
         // If the token is a character, we need to create a paragraph node starting
         // at this token and walking until we find a new line.
-        let paragraph = new Paragraph([this.consume()!]);
+        let paragraph = new Paragraph([]);
 
-        while (this.currentToken() && this.currentToken()!.type !== TokenType.NEW_LINE) {
-            // TODO: Allow for links and other elements
+        let currentText = new Text([this.consume()!]);
+        while (this.currentToken() && this.currentToken()!.type !== TokenType.HEADER_IDENTIFIER) {
             const next = this.consume()!;
-            paragraph.tokens.push(next);
+
+            // If this next is a new line, we need to append the current text to
+            // the paragraph and create a new text object to continue.
+            if (next.type === TokenType.NEW_LINE) {
+                paragraph.text.push(currentText);
+                currentText = new Text([]);
+                continue;
+            }
+            else {
+                // This is a normal character, so we can append it to the current text
+                currentText.tokens.push(next);
+            }
         }
 
         return paragraph;
@@ -138,7 +186,7 @@ export class Parser {
                 this.consume();
                 continue;
             }
-            else if (token.type == TokenType.HEADER) {
+            else if (token.type == TokenType.HEADER_IDENTIFIER) {
                 console.log('Parsing header');
                 const header = this.parseHeader();
                 console.log('Parsed header and pushing', header);
