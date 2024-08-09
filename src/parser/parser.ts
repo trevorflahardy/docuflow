@@ -84,26 +84,46 @@ export class Parser {
         return this.tokens[0];
     }
 
-    // private parseItalic(): Italic {
-    //     // Called if the current token is a star, it is not followed
-    //     // by another star (for a bold) or a space for a raw star or list of 
-    //     // some sort.
-    //     let italic = new Italic([]);
-    // 
-    //     // Consume this token to ignore the star
-    //     this.consume();
-    // 
-    //     while (this.currentToken() && this.currentToken()!.type !== TokenType.STAR_IDENTIFIER) {
-    //         const next = this.consume()!;
-    //         italic.tokens.push(next);
-    //     }
-    // 
-    //     // We know the next token is a star, so consume it
-    //     this.consume();
-    // 
-    //     // And return the italic node
-    //     return italic;
-    // }
+    /**
+     * Parses an italic token. This is a Text that is surrounded by a single star
+     * on either side. For example, *this is italic*.
+     * 
+     * The invariant is that the current token is a star, and the next token
+     * is a character. This will consume the star token and return an Italic
+     * object.
+     */
+    private parseItalic(): Italic {
+        let italic = new Italic([]);
+        let currentText = new Text([]);
+
+        // While the current token is not a star, consume the token and add it to
+        // the current text.
+        while (this.currentToken() && this.currentToken()!.type !== TokenType.STAR_IDENTIFIER) {
+            const next = this.consume()!;
+
+            // If this is a new line, we need to create a new text object and
+            // continue parsing.
+            if (next.type === TokenType.NEW_LINE) {
+                italic.nodes.push(currentText);
+                currentText = new Text([]);
+                continue;
+            }
+
+            // Otherwise, add the token to the current text
+            currentText.tokens.push(next);
+        }
+
+        // After we have all the tokens, consume the star token at the end, if it exists
+        this.consume();
+
+        // And if the currentText has tokens, we need to append it to the italic object
+        if (currentText.length > 0) {
+            italic.nodes.push(currentText);
+        }
+
+        return italic
+    }
+
 
     private parseHeader(): Heading {
         // If the token is a header, we need to create a header node starting
@@ -125,12 +145,22 @@ export class Parser {
             // TODO: If this is some italic identifier, append the currentText to
             // TODO: header, parse new italic object, and then create a new currentText
             // TODO: object.
+            if (next.type === TokenType.STAR_IDENTIFIER && this.peek() && this.peek()!.type === TokenType.CHAR) {
+                header.nodes.push(currentText);
+                currentText = new Text([]);
+                const italic = this.parseItalic();
+                header.nodes.push(italic);
+                continue
+            }
 
             // For now, just add the token to the current text
             currentText.tokens.push(next);
         }
 
-        header.nodes.push(currentText);
+        if (currentText.length > 0) {
+            header.nodes.push(currentText);
+        }
+
         return header;
     }
 
@@ -146,14 +176,32 @@ export class Parser {
             // If this next is a new line, we need to append the current text to
             // the paragraph and create a new text object to continue.
             if (next.type === TokenType.NEW_LINE) {
-                paragraph.text.push(currentText);
+                if (currentText.length > 0) {
+                    paragraph.nodes.push(currentText);
+                }
+
                 currentText = new Text([]);
+                continue;
+            }
+            else if (next.type === TokenType.STAR_IDENTIFIER && this.peek() && this.peek()!.type === TokenType.CHAR) {
+                if (currentText.length > 0) {
+                    paragraph.nodes.push(currentText);
+                }
+
+                currentText = new Text([]);
+                const italic = this.parseItalic();
+                paragraph.nodes.push(italic);
                 continue;
             }
             else {
                 // This is a normal character, so we can append it to the current text
                 currentText.tokens.push(next);
             }
+        }
+
+        // If the current text has tokens, we need to append it to the paragraph
+        if (currentText.length > 0) {
+            paragraph.nodes.push(currentText);
         }
 
         return paragraph;

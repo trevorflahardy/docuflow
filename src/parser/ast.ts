@@ -33,19 +33,20 @@ export class Text implements Node {
  * a body.
  */
 export class Paragraph implements Node {
-    text: Array<Text> = [];
+    nodes: Array<Node> = [];
 
-    constructor(text: Array<Text>) {
-        this.text = text;
+    constructor(nodes: Array<Node>) {
+        this.nodes = nodes;
     }
 
     get length(): number {
-        return this.text.length;
+        return this.nodes.length;
     }
 
     toHTML(): string {
-        // The body must be wrapped in a <p> tag
-        return `<p>${this.text.map(token => token.toHTML()).join("\n")}</p>`
+        // Every node in this paragraph should be wrapped in a <p> tag.
+        // So for N nodes we have N <p> tags.
+        return this.nodes.map(node => `<p>${node.toHTML()}</p>`).join("\n");
     }
 }
 

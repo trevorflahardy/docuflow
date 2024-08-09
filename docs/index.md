@@ -25,3 +25,7 @@ This is a body after H5.
 ###### This is an H6 header
 
 This is a body after H6.
+
+*This is some text that should be italic.*
+
+## This is a Header with *Italic Text in It That is Consumed Properly* and can have normal text after it
