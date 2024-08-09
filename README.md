@@ -29,7 +29,7 @@ blocks, variables, latex, etc.
 - [ ] Conventional Markdown parsing
   - [x] Headers
   - [x] Paragraphs
-  - [ ] Italic
+  - [x] Italic
   - [ ] Bold
   - [ ] Lists
   - [ ] Code blocks
