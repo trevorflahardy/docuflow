@@ -1,4 +1,4 @@
-import { Heading, Italic, Node, Paragraph, Text } from "./ast";
+import { Bold, Heading, Italic, Node, Paragraph, Text } from "./ast";
 import { TokenType, Token } from "./tokens";
 
 /**
@@ -56,18 +56,28 @@ export class Parser {
         return this.tokens[forwardBy];
     }
 
-    /**
-     * Consumes the current token in the stream and returns it. Moves
-     * onto the next token. Returns NULL if there are no more tokens.
-     */
-    private consume(): Token | null {
+    // Overloads
+    private consume(): Token | null;
+    private consume(forwardBy: number): Array<Token> | null;
+
+    private consume(forwardBy?: number): Token | Array<Token> | null {
         if (this.tokens.length == 0) {
             return null;
         }
 
-        // Remove the first token in the array, index 0, and return it
-        const token = this.tokens.shift()!;
-        return token;
+        if (forwardBy == undefined) {
+            // Remove the first token in the array, index 0, and return it
+            const token = this.tokens.shift()!;
+            return token;
+        }
+        else {
+            // Ensure the count is within the bounds of the tokens
+            const count = Math.min(forwardBy, this.tokens.length);
+
+            // Remove the specified number of tokens from the array and return them
+            return this.tokens.splice(0, count);
+        }
+
     }
 
     private currentToken(): Token | null {
@@ -102,6 +112,16 @@ export class Parser {
         return !currentTokenIs;
     }
 
+    private currentMayBeItalic(): boolean {
+        const peek = this.peek();
+        return this.currentToken() !== null && this.currentTokenIs(TokenType.UNDERLINE_IDENTIFIER)! && peek !== null && peek.type === TokenType.CHAR;
+    }
+
+    private currentMayBeBold(): boolean {
+        const peek = this.peek();
+        return this.currentToken() !== null && this.currentTokenIs(TokenType.STAR_IDENTIFIER)! && peek !== null && peek.type === TokenType.STAR_IDENTIFIER;
+    }
+
     /**
      * Denotes if a possible bold can be parsed. That is, if the bold has an
      * ending double star. This is important because we need to know if we can parse a
@@ -112,6 +132,26 @@ export class Parser {
      * This is ** not bold -> Cannot parse
      */
     private canParseBold(): boolean {
+        let ahead = 1;
+        let nextToken: Token | null;
+        let followingToken: Token | null;
+
+        // While the next peek and the following are not null
+        while ((nextToken = this.peek(ahead)) !== null && (followingToken = this.peek(ahead)) !== null) {
+            // Return true if we find the closing stars
+            if (nextToken.type === TokenType.STAR_IDENTIFIER && followingToken.type === TokenType.STAR_IDENTIFIER) {
+                return true;
+            }
+
+            // Return false if we hit a new line
+            if (nextToken.type === TokenType.NEW_LINE || followingToken.type === TokenType.NEW_LINE) {
+                return false;
+            }
+
+            ahead++;
+        }
+
+        // We have hit the end of the tokens and did not find a closing star
         return false;
     }
 
@@ -130,7 +170,7 @@ export class Parser {
 
         while ((nextToken = this.peek(ahead)) !== null) {
             // Break if we find the closing star or hit a new line
-            if (nextToken.type === TokenType.STAR_IDENTIFIER) {
+            if (nextToken.type === TokenType.UNDERLINE_IDENTIFIER) {
                 return true;
             }
 
@@ -143,6 +183,53 @@ export class Parser {
 
         // If we exit the loop, we didn't find a closing star
         return false;
+    }
+
+
+    private parsePotentialBold(): Bold | null {
+        if (!this.canParseBold()) {
+            console.log('Cannot parse bold for current token', this.currentToken());
+            return null;
+        }
+
+        // Consume the two star tokens at the beginning
+        const consumed = this.consume(2);
+        console.log('Consumed two stars when parsing bold: ', consumed);
+
+        let bold = new Bold([]);
+        let currentText = new Text([]);
+
+        // While the current token is not a star
+        while (this.currentTokenIsNot(TokenType.STAR_IDENTIFIER) && this.peek() !== null && this.peek()!.type !== TokenType.STAR_IDENTIFIER) {
+            if (this.currentMayBeItalic()) {
+                // This may be some italic text. Try and parse it. If we can't, treat it as a normal character
+                const italic = this.parsePotentialItalic();
+                if (italic) {
+                    // We were able to parse it. Push the current text, reset it, and add the italic 
+                    bold.nodes.push(currentText);
+                    currentText = new Text([]);
+                    bold.nodes.push(italic);
+                    continue;
+                }
+            }
+
+            const next = this.consume()!;
+            currentText.tokens.push(next);
+        }
+
+        // Because the while loop looks while the current token is not a star and the following isn't a star,
+        // when we break out of the loop we have one additional char to consume.
+        currentText.tokens.push(this.consume()!);
+
+        // Consume the ending star tokens
+        this.consume(2);
+
+        // If the current text has tokens, we need to append it to the bold object
+        if (currentText.length > 0) {
+            bold.nodes.push(currentText);
+        }
+
+        return bold
     }
 
     /**
@@ -169,7 +256,21 @@ export class Parser {
 
         // While the current token is not a star, consume the token and add it to
         // the current text.
-        while (this.currentTokenIsNot(TokenType.STAR_IDENTIFIER)) {
+        while (this.currentTokenIsNot(TokenType.UNDERLINE_IDENTIFIER)) {
+            // Check if we could have some bold text. If we can, try and parse it
+            if (this.currentMayBeBold()) {
+                // Try and parse the bold. If we can't, then we just treat this star as if it was
+                // a normal character.
+                const bold = this.parsePotentialBold();
+                if (bold) {
+                    // We were able to parse it. Push the current text, reset it, and add the bold
+                    italic.nodes.push(currentText);
+                    currentText = new Text([]);
+                    italic.nodes.push(bold);
+                    continue;
+                }
+            }
+
             const next = this.consume()!;
             currentText.tokens.push(next);
         }
@@ -201,7 +302,7 @@ export class Parser {
         let currentText = new Text([]);
         while (this.currentTokenIsNot(TokenType.NEW_LINE)) {
             // If this is a star and the next is a char, this could be an italic
-            if (this.currentTokenIs(TokenType.STAR_IDENTIFIER) && this.peek() && this.peek()!.type === TokenType.CHAR) {
+            if (this.currentMayBeItalic()) {
                 // Try and parse the italic. If we can't, then we just treat this star as if it was
                 // a normal character.
                 const italic = this.parsePotentialItalic();
@@ -217,6 +318,21 @@ export class Parser {
                 }
 
                 continue;
+            }
+            else if (this.currentMayBeBold()) {
+                // Try and parse the bold. If we can't, then we just treat this star as if it was
+                // a normal character.
+                const bold = this.parsePotentialBold();
+                if (bold) {
+                    // We were able to parse it. Push the current text, reset it, and add the bold
+                    header.nodes.push(currentText);
+                    currentText = new Text([]);
+                    header.nodes.push(bold);
+                }
+                else {
+                    // We were not able to parse it. Push this star as a normal character
+                    currentText.tokens.push(this.consume()!);
+                }
             }
 
             // For now, just add the token to the current text
@@ -273,7 +389,7 @@ export class Parser {
                 continue;
             }
             // If this token is a star and the next is a char, this is an italic
-            else if (this.currentTokenIs(TokenType.STAR_IDENTIFIER) && this.peek() && this.peek()!.type === TokenType.CHAR) {
+            else if (this.currentMayBeItalic()) {
                 // Try and parse this italic. If we can't, treat it as a normal character
                 const italic = this.parsePotentialItalic();
                 if (italic) {
@@ -284,16 +400,27 @@ export class Parser {
                     }
 
                     paragraph.nodes.push(italic);
-                }
-                else {
-                    // This is not valid, so we need to treat this star as a normal character
-                    currentText.tokens.push(this.consume()!);
+                    continue;
                 }
             }
-            else {
-                // This is a normal character, so we can append it to the current text
-                currentText.tokens.push(this.consume()!);
+            // If this token is a star and the following is also a star, then this is a bold
+            else if (this.currentMayBeBold()) {
+                // Try and parse the bold. If we can't, treat it as a normal character
+                const bold = this.parsePotentialBold();
+                if (bold) {
+                    // This is valid, so we need to push the current text, reset it, and add the bold
+                    if (currentText.length > 0) {
+                        paragraph.nodes.push(currentText);
+                        currentText = new Text([]);
+                    }
+
+                    paragraph.nodes.push(bold);
+                    continue;
+                }
             }
+
+            // All parsing has failed, this must be a normal character
+            currentText.tokens.push(this.consume()!);
         }
 
         // If the current text has tokens, we need to append it to the paragraph

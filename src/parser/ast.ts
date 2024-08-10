@@ -79,3 +79,15 @@ export class Italic implements Node {
         return `<i>${this.nodes.map(node => node.toHTML()).join("")}</i>`;
     }
 }
+
+export class Bold implements Node {
+    nodes: Array<Node> = [];
+
+    constructor(nodes: Array<Node>) {
+        this.nodes = nodes;
+    }
+
+    toHTML(): string {
+        return `<strong>${this.nodes.map(node => node.toHTML()).join("")}</strong>`;
+    }
+}

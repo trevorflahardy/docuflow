@@ -6,6 +6,7 @@ export enum TokenType {
     CHAR,
     NEW_LINE,
     STAR_IDENTIFIER,
+    UNDERLINE_IDENTIFIER,
 }
 
 
@@ -29,6 +30,8 @@ export class Token {
                 return TokenType.NEW_LINE;
             case "*":
                 return TokenType.STAR_IDENTIFIER;
+            case "_":
+                return TokenType.UNDERLINE_IDENTIFIER;
             default:
                 return TokenType.CHAR;
         }
