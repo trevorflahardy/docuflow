@@ -34,7 +34,7 @@ blocks, variables, latex, etc.
   - [x] Headers
   - [x] Paragraphs
   - [x] Italic
-  - [ ] Bold
+  - [x] Bold
   - [ ] Lists
   - [ ] Code blocks
   - [ ] Links (between MD files, need routing)
