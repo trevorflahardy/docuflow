@@ -7,7 +7,7 @@
         "directory": "./docs",
         "submodules": [],
         "files": [
-            "./docs/index.md"
+            "index.md"
         ]
     }
 }

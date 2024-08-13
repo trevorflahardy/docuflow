@@ -1,5 +1,4 @@
 import { loadConfig, ModuleConfig } from "./config";
-import pathLib from 'path';
 
 
 export async function findModule(path: string[]): Promise<ModuleConfig | null> {
@@ -36,9 +35,9 @@ export async function findModule(path: string[]): Promise<ModuleConfig | null> {
 export function findFileInModule(fileName: string, module: ModuleConfig): string | null {
     // If this file name is not in the module, then we return null
     for (const file of module.files) {
+        console.log(file, fileName);
         // This file is a full path, so we need to extract the file name
-        const basename = pathLib.basename(file);
-        if (basename.toLowerCase() === fileName.toLowerCase()) {
+        if (file.toLowerCase() === `${fileName.toLowerCase()}.md`) {
             return file;
         }
     }

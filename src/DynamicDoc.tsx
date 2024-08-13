@@ -1,4 +1,7 @@
 import { useParams } from 'react-router';
+import { findModule, findFileInModule } from './docuflow/utils';
+import { useEffect, useState } from 'react';
+import { ModuleConfig } from './docuflow/config';
 
 
 /**
@@ -13,13 +16,34 @@ function parseDocPath(docPath?: string): string[] {
 }   
 
 export default function DynamicDoc(): React.ReactElement {
+    const [loading, setLoading] = useState(true);
+    const [module, setModule] = useState(null as ModuleConfig | null);
+    const [file, setFile] = useState(null as string | null);
+
     const { '*': docPath } = useParams<{ '*': string }>();
 
+    useEffect(() => {
+        (async () => {
+            const path = parseDocPath(docPath);
+            const module = await findModule(path);
+            setModule(module);
+            
+            if (module) {
+                const file = findFileInModule(path.pop()!, module);
+                setFile(file);
+            }
+
+            setLoading(false);
+
+        })()
+    }, []);
+
+    const path = parseDocPath(docPath);
     return (
         <>
             <div className='basis-4/5 ml-10 mt-5'>
                 <h1>
-                    Looking at docs for {docPath}
+                    Looking at docs for {path} {loading ? '...' : ''} {module ? 'Module found!' : ''} {file ? 'File found!' : ''}
                 </h1>
             </div>
         </>
