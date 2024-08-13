@@ -1,7 +1,8 @@
 import Banner from "./components/banner/Banner";
 import MainContent from "./MainContent";
 
-function Docs() {
+export default function Docs() {
+
   return (
     <>
       {/* The container for the entire app. Holds the header, navigation, etc. */}
@@ -12,5 +13,3 @@ function Docs() {
     </>
   )
 }
-
-export default Docs

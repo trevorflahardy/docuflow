@@ -2,12 +2,21 @@
     "docsDir": "./docs",
     "outDir": "./dist",
     "projectName": "Docuflow",
-    "module": {
-        "name": "Docuflow",
-        "directory": "./docs",
-        "submodules": [],
-        "files": [
-            "index.md"
-        ]
-    }
+    "modules": [
+        {
+            "name": "Welcome",
+            "directory": "welcome",
+            "files": [
+                "index.mdx",
+                "what_is_docuflow.mdx"
+            ]
+        },
+        {
+            "name": "Getting Started",
+            "directory": "getting_started",
+            "files": [
+                "index.mdx"
+            ]
+        }
+    ]
 }

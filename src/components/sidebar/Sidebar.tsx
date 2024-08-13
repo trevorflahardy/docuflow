@@ -1,36 +1,82 @@
+import { useEffect, useState } from "react";
+import Config, { ModuleConfig } from '../../docuflow/config';
+import { Link } from "react-router-dom";
+
+function SidebarModule({ config, module }: {config: Config, module: ModuleConfig }): React.ReactElement {
+    // TODO: open and setOpen state for a dropdown (?)
+    const submodules = module.submodules;
+    const files = module.files;
+    const hasIndex = files && files.includes("index.mdx");
+
+    return (
+        <>
+            <div className="font-semibold text-black mt-2 hover:text-slate-700 transition-colors duration-500 ease-out">
+                {
+                    hasIndex ? (
+                        <Link to={config.createFilePath(module, "index.mdx")}>
+                            {module.name}
+                        </Link>
+                    ) : (
+                        <>
+                            {module.name}
+                        </>
+                    )
+                }
+            </div>
+
+            {/* The module's items and submodules -> Has a bar down the left side of it, and contains any sub-modules nested in it. */}
+            <div className="w-full border-l border-gray-400 pl-3 !mt-1">
+                {
+                    files && files.filter((file) => {
+                        return file.toLowerCase() !== "index.mdx";
+                    }).map((file) => (
+                        <div key={file} className="text-slate-800 text-sm hover:text-black hover:border-black transition-colors duration-200 ease-out">
+                            <Link to={config.createFilePath(module, file)}>
+                                {config.fileNameToDisplayName(file)}
+                            </Link>
+                        </div>    
+                    ))
+                }
+                
+                {
+                    submodules && submodules.map((submodule) => (
+                        <SidebarModule key={submodule.name} config={config} module={submodule} />
+                    ))
+                }
+            </div>
+        </>
+    )
+}
+
 /**
  * TODO; Some sort of passing to this sidebar for dynamic modules and whatnot.
  */
 export default function Sidebar(): React.ReactElement {
+    const [config, setConfig] = useState(null as Config | null);
+
+    // Load the config file
+    useEffect(() => {
+        (async () => {
+            const config = await Config.load();
+            setConfig(config);
+        })()
+    }, []);
+
     // The sidebar for this app. Contains navigation, searching, etc.
     return (
         <>
-            <div className="basis-1/5 px-3 py-5 space-y-3 overflow-y-auto border-r border-slate-200">
+            <div className="w-fit px-3 min-w-64 py-5 space-y-3 overflow-y-auto border-r border-slate-200">
                 {/* Holds the search bar which is always pinned at the top while scrolling down */}
                 <div className="py-2 px-4 rounded-full text-xs font-light bg-slate-100">
                     Search Placeholder
                 </div>
 
                 {/* The sidebar content below the pinned search bar*/}
-                <div className="leading-loose space-y-50">
-                    {/* TODO: This must be moved to dynamic component */}
-                    <div>
-                        {/* Similar to tailwindcss.com's sidebar */}
-                        <p className="font-semibold mb-1 text-black">
-                            Module Name
-                        </p>
-
-                        {/* The module's items -> Has a bar down the left side of it*/}
-                        <div>
-                            <p className="border-l border-gray-500 pl-3 text-gray-500 text-sm hover:text-black hover:border-black transition-colors duration-200 ease-out">
-                                Module Subitem
-                            </p>
-                            <p className="border-l border-gray-500 pl-3 text-gray-500 text-sm hover:text-black hover:border-black transition-colors duration-200 ease-out">
-                                Module Subitem
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                {
+                    config ? config.modules.map((module) => (
+                        <SidebarModule key={module.name} config={config} module={module} />
+                    )) : <p>Loading...</p>
+                }
             </div>
 
         </>

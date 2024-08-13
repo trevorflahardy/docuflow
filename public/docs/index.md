@@ -1,3 +1,0 @@
-# Docuflow
-
-Welcome to Docuflow! 
