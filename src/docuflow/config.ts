@@ -16,6 +16,16 @@ export interface ModuleConfigOptions {
 }
 
 /**
+ * Represents the theme configuration. This is the custom styling of the docuflow project.
+ */
+export interface ThemeOptions {
+    accentColor: {
+        light: string;
+        dark: string;
+    }
+}
+
+/**
  * Represents docuflow's configuration type.
  */
 export interface ConfigOptions {
@@ -23,6 +33,7 @@ export interface ConfigOptions {
     outDir?: string; // A relative path to the output directory.
     projectName: string;
     modules: ModuleConfigOptions[];
+    theme: ThemeOptions,
 }
 
 export class ModuleConfig {

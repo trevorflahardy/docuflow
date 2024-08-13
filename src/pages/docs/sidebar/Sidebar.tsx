@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Config, { ModuleConfig, fileNameToDisplayName } from '../../docuflow/config';
+import Config, { ModuleConfig, fileNameToDisplayName } from '../../../docuflow/config';
 import { Link } from "react-router-dom";
 
 function SidebarModule({ config, module }: {config: Config, module: ModuleConfig }): React.ReactElement {

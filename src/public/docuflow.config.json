@@ -18,5 +18,11 @@
                 "index.mdx"
             ]
         }
-    ]
+    ],
+    "theme": {
+        "accentColor": {
+            "light": "#FF1E00",
+            "dark": "#FF1E00"
+        }
+    }
 }

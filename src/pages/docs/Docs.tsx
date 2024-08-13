@@ -1,4 +1,4 @@
-import Banner from "./components/banner/Banner";
+import Banner from "../../components/banner/Banner";
 import MainContent from "./MainContent";
 
 export default function Docs() {

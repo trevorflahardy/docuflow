@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import Sidebar from "./components/sidebar/Sidebar";
+import Sidebar from "./sidebar/Sidebar";
 import DynamicDoc from "./DynamicDoc";
 import OnThisPage from "./OnThisPage";
 

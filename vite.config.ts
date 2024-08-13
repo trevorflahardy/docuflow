@@ -8,4 +8,5 @@ export default defineConfig({
     { enforce: 'pre', ...mdx({ jsxImportSource: 'react' }) },
     react()
   ],
+  publicDir: 'src/public'
 })
