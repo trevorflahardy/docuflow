@@ -17,3 +17,9 @@ export default interface Config {
     projectName: string,
     module: ModuleConfig
 }
+
+export async function loadConfig(): Promise<Config> {
+    // Open the public/docuflow.config.json file and return its contents as a Config object
+    const config = await fetch('/docuflow.config.json');
+    return config.json();
+}

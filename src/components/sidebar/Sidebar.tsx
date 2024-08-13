@@ -5,20 +5,18 @@ export default function Sidebar(): React.ReactElement {
     // The sidebar for this app. Contains navigation, searching, etc.
     return (
         <>
-            <div className="w-full h-full relative basis-1/5 px-3 py-5 space-y-3"  >
-                <div className="w-full h-full overflow-y-scroll">
-                    {/* Holds the search bar which is always pinned at the top while scrolling down */}
-                    <div className="py-2 px-4 bg-gray-200 text-gray-600 rounded-full text-xs font-light">
-                        Search Placeholder
-                    </div>
+            <div className="basis-1/5 px-3 py-5 space-y-3 overflow-y-auto border-r border-slate-200">
+                {/* Holds the search bar which is always pinned at the top while scrolling down */}
+                <div className="py-2 px-4 rounded-full text-xs font-light bg-slate-100">
+                    Search Placeholder
                 </div>
 
                 {/* The sidebar content below the pinned search bar*/}
-                <div className="leading-loose">
+                <div className="leading-loose space-y-50">
                     {/* TODO: This must be moved to dynamic component */}
                     <div>
                         {/* Similar to tailwindcss.com's sidebar */}
-                        <p className="font-semibold mb-1">
+                        <p className="font-semibold mb-1 text-black">
                             Module Name
                         </p>
 
