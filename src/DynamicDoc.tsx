@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState, Dispatch, SetStateAction ,ReactNode } from "react";
 import { MDXProvider } from "@mdx-js/react";
 import { compile, run } from "@mdx-js/mdx";
 
@@ -11,19 +11,29 @@ import { MDXHeading } from "./MainContent";
 // @ts-expect-error: the automatic react runtime is untyped.
 const runtime: { Fragment: Fragment; jsx: Jsx; jsxs: Jsx } = runtime_;
 
-export default function DynamicDoc({
+type HeadingProps = {
+  level: number;
+  children: React.ReactNode;
+};
+
+type ComponentsType = {
+  [key: string]: (props: HeadingProps) => JSX.Element;
+};
+
+const headingLevels = [1, 2, 3, 4, 5, 6];
+
+function ParseMDX({
   setHeadings,
+  setMdxElement,
+  filePath,
 }: {
-  setHeadings: React.Dispatch<React.SetStateAction<MDXHeading[]>>;
-}): React.ReactElement {
-  const [mdxElement, setMdxElement] = useState<React.ReactNode>(null);
-
-  const { "*": filePath } = useParams<{ "*": string }>();
-
+  setHeadings: Dispatch<SetStateAction<MDXHeading[]>>;
+  setMdxElement: Dispatch<SetStateAction<ReactNode>>;
+  filePath: string | undefined;
+}): void {
   useEffect(() => {
     (async () => {
       // Fetch the requested file path documentation
-      console.log(filePath);
       const response = await fetch(`/docs/${filePath}`);
       const mdxText = await response.text();
 
@@ -51,38 +61,60 @@ export default function DynamicDoc({
         const id = text.toLowerCase().replace(/\s/g, "-");
 
         // Check if the heading already exists in tempHeadings
-        if (!tempHeadings.some((heading) => heading.id === id && heading.level === level)) {
+        if (
+          !tempHeadings.some(
+            (heading) => heading.id === id && heading.level === level
+          )
+        ) {
           tempHeadings.push({ id, text, level });
         }
-  
-        return React.createElement(`h${level}`, { id }, children);
+
+        return React.createElement(
+          `h${level}`,
+          { id, className: "group" },
+          <>
+            {children}
+            <a
+              href={`#${id}`}
+              className="invisible group-hover:visible text-gray-700 hover:text-gray-900 text-sm"
+            >
+              #
+            </a>
+          </>
+        );
       };
 
       setHeadings(tempHeadings);
+      
+      const components: ComponentsType = headingLevels.reduce((acc, level) => {
+        acc[`h${level}`] = (props) => (
+          <Heading {...props} level={level} children={props.children} />
+        );
+
+        return acc;
+      }, {} as ComponentsType);
+
       setMdxElement(
         <Content
-          components={{
-            h1: (props) => <Heading level={1} children={props.children} />,
-            h2: (props) => (
-              <Heading {...props} level={2} children={props.children} />
-            ),
-            h3: (props) => (
-              <Heading {...props} level={3} children={props.children} />
-            ),
-            h4: (props) => (
-              <Heading {...props} level={4} children={props.children} />
-            ),
-            h5: (props) => (
-              <Heading {...props} level={5} children={props.children} />
-            ),
-            h6: (props) => (
-              <Heading {...props} level={6} children={props.children} />
-            ),
-          }}
+          components={components}
         />
       );
     })();
   }, [filePath]);
+}
+
+export default function DynamicDoc({
+  setHeadings,
+}: {
+  setHeadings: React.Dispatch<React.SetStateAction<MDXHeading[]>>;
+}): React.ReactElement {
+  const [mdxElement, setMdxElement] = useState<React.ReactNode>(null);
+
+  const { "*": filePath } = useParams<{ "*": string }>();
+
+  ParseMDX({
+    setHeadings, setMdxElement, filePath
+  });
 
   return (
     <>

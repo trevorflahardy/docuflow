@@ -4,16 +4,16 @@
     "projectName": "Docuflow",
     "modules": [
         {
-            "name": "Welcome",
             "directory": "welcome",
+            "index": 0,
             "files": [
                 "index.mdx",
                 "what_is_docuflow.mdx"
             ]
         },
         {
-            "name": "Getting Started",
             "directory": "getting_started",
+            "index": 1,
             "files": [
                 "index.mdx"
             ]

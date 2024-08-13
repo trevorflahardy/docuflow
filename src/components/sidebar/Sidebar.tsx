@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import Config, { ModuleConfig } from '../../docuflow/config';
+import Config, { ModuleConfig, fileNameToDisplayName } from '../../docuflow/config';
 import { Link } from "react-router-dom";
 
 function SidebarModule({ config, module }: {config: Config, module: ModuleConfig }): React.ReactElement {
-    // TODO: open and setOpen state for a dropdown (?)
     const submodules = module.submodules;
     const files = module.files;
     const hasIndex = files && files.includes("index.mdx");
@@ -32,7 +31,7 @@ function SidebarModule({ config, module }: {config: Config, module: ModuleConfig
                     }).map((file) => (
                         <div key={file} className="text-slate-800 text-sm hover:text-black hover:border-black transition-colors duration-200 ease-out">
                             <Link to={config.createFilePath(module, file)}>
-                                {config.fileNameToDisplayName(file)}
+                                {fileNameToDisplayName(file)}
                             </Link>
                         </div>    
                     ))
@@ -40,7 +39,7 @@ function SidebarModule({ config, module }: {config: Config, module: ModuleConfig
                 
                 {
                     submodules && submodules.map((submodule) => (
-                        <SidebarModule key={submodule.name} config={config} module={submodule} />
+                        <SidebarModule key={submodule.index} config={config} module={submodule} />
                     ))
                 }
             </div>
@@ -74,7 +73,7 @@ export default function Sidebar(): React.ReactElement {
                 {/* The sidebar content below the pinned search bar*/}
                 {
                     config ? config.modules.map((module) => (
-                        <SidebarModule key={module.name} config={config} module={module} />
+                        <SidebarModule key={module.index} config={config} module={module} />
                     )) : <p>Loading...</p>
                 }
             </div>

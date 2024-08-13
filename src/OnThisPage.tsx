@@ -3,7 +3,7 @@ import { MDXHeading } from "./MainContent";
 export default function OnThisPage({ headings }: { headings: MDXHeading[] }): React.ReactElement {
     return (
         <>
-            <div className="min-w-72 m-5">
+            <div className="min-w-52 m-5">
                 <p className="font-semibold text-black">
                     On this Page
                 </p>

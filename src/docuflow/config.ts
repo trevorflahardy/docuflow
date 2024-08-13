@@ -2,9 +2,13 @@
  * Represents a package's configuration. This is the layout of the docuflow project. If not provided, one will be generated automatically with the CLI.
  */
 export interface ModuleConfigOptions {
-    name: string;
     directory: string;
     submodules?: ModuleConfigOptions[];
+
+    // An index representing the order of this module. If not provided, it will be generated
+    // based om the order they are given in the directory. This can be set through the `module.js`
+    // file in the module's directory.
+    index: number;
 
     // A list of files in the module. The path is relative to the location of the module's
     // directory. Thus, docs/module/file.md would be file.md
@@ -15,12 +19,11 @@ export interface ModuleConfigOptions {
  * Represents docuflow's configuration type.
  */
 export interface ConfigOptions {
-    docsDir?: string, // A relative path to the docs directory (where the docs are located.)
-    outDir?: string, // A relative path to the output directory.
-    projectName: string,
-    modules: ModuleConfigOptions[]
+    docsDir?: string; // A relative path to the docs directory (where the docs are located.)
+    outDir?: string; // A relative path to the output directory.
+    projectName: string;
+    modules: ModuleConfigOptions[];
 }
-
 
 export class ModuleConfig {
     options: ModuleConfigOptions;
@@ -28,15 +31,22 @@ export class ModuleConfig {
     parent: ModuleConfig | null;
     submodules: ModuleConfig[];
 
-
-    constructor(options: ModuleConfigOptions, parent: ModuleConfig | null = null) {
+    constructor(
+        options: ModuleConfigOptions,
+        parent: ModuleConfig | null = null
+    ) {
         this.options = options;
         this.parent = parent;
-        this.submodules = options.submodules?.map(submodule => new ModuleConfig(submodule, this)) || [];
+        this.submodules =
+            options.submodules
+                ?.map((submodule) => new ModuleConfig(submodule, this))
+                .sort((a, b) => {
+                    return a.index - b.index;
+                }) || [];
     }
 
     get name(): string {
-        return this.options.name;
+        return fileNameToDisplayName(this.directory);
     }
 
     get directory(): string {
@@ -46,6 +56,10 @@ export class ModuleConfig {
     get files(): string[] {
         return this.options.files || [];
     }
+
+    get index(): number {
+        return this.options.index;
+    }
 }
 
 export default class Config {
@@ -54,7 +68,9 @@ export default class Config {
 
     constructor(options: ConfigOptions) {
         this.options = options;
-        this.modules = options.modules.map(module => new ModuleConfig(module));
+        this.modules = options.modules.map((module) => new ModuleConfig(module)).sort((a, b) => {
+            return a.index - b.index;
+        });
     }
 
     /**
@@ -74,7 +90,7 @@ export default class Config {
 
     /**
      * Takes a file name and module and creates a full path to the file.
-     * 
+     *
      * Ie, index.md in /welcome/index.md, would be welcome/index.md
      */
     createFilePath(module: ModuleConfig, file: string): string {
@@ -106,7 +122,9 @@ export default class Config {
         }
 
         for (let i = 1; i < path.length; i++) {
-            const submodule: ModuleConfig | undefined = currentModule.submodules.find(submodule => submodule.name.toLowerCase() === path[i].toLowerCase());
+            const submodule: ModuleConfig | undefined = currentModule.submodules.find(
+                (submodule) => submodule.name.toLowerCase() === path[i].toLowerCase()
+            );
 
             if (!submodule) {
                 return null;
@@ -117,19 +135,17 @@ export default class Config {
 
         return currentModule;
     }
-
-    fileNameToDisplayName(file: string): string {
-        // Takes a file like name and transforms it to some display name.
-        return file
-            .replace(/_/g, ' ') // Replace all underscores
-            .replace(/-/g, ' ') // Replace all hyphens
-            .replace('.mdx', '') // Remove .mdx extension
-            .replace('.md', '') // Remove .md extension
-            .replace(
-                /\w\S*/g,
-                text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
-            );
-
-    }
 }
 
+export function fileNameToDisplayName(file: string): string {
+    // Takes a file like name and transforms it to some display name.
+    return file
+        .replace(/_/g, " ") // Replace all underscores
+        .replace(/-/g, " ") // Replace all hyphens
+        .replace(".mdx", "") // Remove .mdx extension
+        .replace(".md", "") // Remove .md extension
+        .replace(
+            /\w\S*/g,
+            (text) => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+        );
+}
