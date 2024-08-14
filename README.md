@@ -34,8 +34,8 @@ blocks, variables, latex, etc.
 - [x] Running and functioning MDX rendering.
 - [x] Auto generated modules.
 - [ ] Project config:
-  - [ ] A settable website accent color.
-  - [ ] Customizable links on the page header.
+  - [x] A settable website accent color.
+  - [ ] Customizable links on the page header (in progress)
  - [ ] A way to add custom pages that aren't documentation-based. 
 
 ... more will be added here as I go along.
