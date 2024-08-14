@@ -21,14 +21,9 @@ export interface ButtonProps {
      * A link to navigate to.
      */
     link?: string;
-
-    /**
-     * Denotes if this link should be a react router dom link or a normal anchor tag.
-     */
-    reactLink?: boolean;
 }
 
-export default function Button({text, color, icon, link, reactLink}: ButtonProps): React.ReactElement {
+export default function Button({text, color, icon, link}: ButtonProps): React.ReactElement {
     let className;
     if (color === "primary") {
         className = "bg-accent-light dark:bg-accent-dark text-white";
@@ -41,7 +36,7 @@ export default function Button({text, color, icon, link, reactLink}: ButtonProps
         return (
             <>
                 <div className={classNames(
-                    "px-4 py-3 font-semibold flex items-center justify-center rounded-xl drop-shadow-md min-w-28 gap-2",
+                    "px-4 py-3 font-semibold flex items-center justify-center rounded-xl min-w-28 gap-2 drop-shadow-md hover:scale-[1.02] transition-all duration-200 ease-in-out",
                     className
                 )}>
                     {icon}
@@ -56,15 +51,9 @@ export default function Button({text, color, icon, link, reactLink}: ButtonProps
     return (
         <>
             {link ? (
-                reactLink ? (
-                    <Link to={link}>
-                        {contentMeat()}
-                    </Link>
-                ): (
-                    <a href={link}>
-                        {contentMeat()}
-                    </a>
-                )
+                <Link to={link}>
+                    {contentMeat()}
+                </Link>
             ) : contentMeat()}
         </>
     )

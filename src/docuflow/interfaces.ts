@@ -25,17 +25,17 @@ export interface ThemeOptions {
     }
 }
 
-interface LinkSettings {
+export interface LinkSettings {
     url: string; // The URL to the link
     name: string; // A display name for the link 
     bannerDisplay?: boolean; // Denotes if the link should be displayed on the website banner.
 }
 
-interface LinksSettings {
+export interface LinksSettings {
     github?: LinkSettings; // A special link for the github repository.
 }
 
-declare type LinksOptions = LinksSettings & {
+export declare type LinksOptions = LinksSettings & {
     [key: string]: string | LinkSettings;
 }
 

@@ -1,6 +1,6 @@
-import Config, { ModuleConfig, fileNameToDisplayName } from '../../../docuflow/config';
+import Config, { ModuleConfig, fileNameToDisplayName } from '../../docuflow/config';
 import { Link } from "react-router-dom";
-import { useConfig } from "../../../state";
+import { useConfig } from "../../state";
 
 function SidebarModule({ config, module }: {config: Config, module: ModuleConfig }): React.ReactElement {
     const submodules = module.submodules;
