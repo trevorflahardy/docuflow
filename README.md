@@ -4,6 +4,8 @@ Docuflow is a lightweight documentation generator from markdown files. It is des
 
 The build time of the site is very fast, as the markdown files are not parsed at build time. Instead, the markdown files are parsed at runtime, and the HTML is cached (or at least, it will be).
 
+![image](https://github.com/user-attachments/assets/b02e1dd0-711a-419e-b88d-b4eae7f3cc33)
+
 <img width="1485" alt="image" src="https://github.com/user-attachments/assets/957a1f8a-4810-46f2-a175-0fbb68d448bd">
 
 
