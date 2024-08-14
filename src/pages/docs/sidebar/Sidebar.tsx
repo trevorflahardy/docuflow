@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import Config, { ModuleConfig, fileNameToDisplayName } from '../../../docuflow/config';
 import { Link } from "react-router-dom";
+import { useConfig } from "../../../state";
 
 function SidebarModule({ config, module }: {config: Config, module: ModuleConfig }): React.ReactElement {
     const submodules = module.submodules;
@@ -12,7 +12,7 @@ function SidebarModule({ config, module }: {config: Config, module: ModuleConfig
             <div className="font-semibold text-black mt-2 hover:text-slate-700 transition-colors duration-500 ease-out">
                 {
                     hasIndex ? (
-                        <Link to={config.createFilePath(module, "index.mdx")}>
+                        <Link to={`/d/${config.createFilePath(module, "index.mdx")}`}>
                             {module.name}
                         </Link>
                     ) : (
@@ -30,7 +30,7 @@ function SidebarModule({ config, module }: {config: Config, module: ModuleConfig
                         return file.toLowerCase() !== "index.mdx";
                     }).map((file) => (
                         <div key={file} className="text-slate-800 text-sm hover:text-black hover:border-black transition-colors duration-200 ease-out">
-                            <Link to={config.createFilePath(module, file)}>
+                            <Link to={`/d/${config.createFilePath(module, file)}`}>
                                 {fileNameToDisplayName(file)}
                             </Link>
                         </div>    
@@ -51,15 +51,7 @@ function SidebarModule({ config, module }: {config: Config, module: ModuleConfig
  * TODO; Some sort of passing to this sidebar for dynamic modules and whatnot.
  */
 export default function Sidebar(): React.ReactElement {
-    const [config, setConfig] = useState(null as Config | null);
-
-    // Load the config file
-    useEffect(() => {
-        (async () => {
-            const config = await Config.load();
-            setConfig(config);
-        })()
-    }, []);
+    const { config } = useConfig();
 
     // The sidebar for this app. Contains navigation, searching, etc.
     return (

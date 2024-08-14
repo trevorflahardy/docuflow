@@ -1,4 +1,4 @@
-import { MDXHeading } from "./MainContent";
+import { MDXHeading } from "./Docs";
 
 export default function OnThisPage({ headings }: { headings: MDXHeading[] }): React.ReactElement {
     return (

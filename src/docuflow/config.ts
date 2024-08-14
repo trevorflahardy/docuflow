@@ -1,40 +1,5 @@
-/**
- * Represents a package's configuration. This is the layout of the docuflow project. If not provided, one will be generated automatically with the CLI.
- */
-export interface ModuleConfigOptions {
-    directory: string;
-    submodules?: ModuleConfigOptions[];
-
-    // An index representing the order of this module. If not provided, it will be generated
-    // based om the order they are given in the directory. This can be set through the `module.js`
-    // file in the module's directory.
-    index: number;
-
-    // A list of files in the module. The path is relative to the location of the module's
-    // directory. Thus, docs/module/file.md would be file.md
-    files?: string[];
-}
-
-/**
- * Represents the theme configuration. This is the custom styling of the docuflow project.
- */
-export interface ThemeOptions {
-    accentColor: {
-        light: string;
-        dark: string;
-    }
-}
-
-/**
- * Represents docuflow's configuration type.
- */
-export interface ConfigOptions {
-    docsDir?: string; // A relative path to the docs directory (where the docs are located.)
-    outDir?: string; // A relative path to the output directory.
-    projectName: string;
-    modules: ModuleConfigOptions[];
-    theme: ThemeOptions,
-}
+import { ModuleConfigOptions } from "./interfaces";
+import projectConfigOptions from '../docuflow.config';
 
 export class ModuleConfig {
     options: ModuleConfigOptions;
@@ -74,12 +39,11 @@ export class ModuleConfig {
 }
 
 export default class Config {
-    options: ConfigOptions;
     modules: ModuleConfig[];
 
-    constructor(options: ConfigOptions) {
-        this.options = options;
-        this.modules = options.modules.map((module) => new ModuleConfig(module)).sort((a, b) => {
+    constructor(modules: ModuleConfigOptions[] = []) {
+        const mods = modules || projectConfigOptions.modules;
+        this.modules = mods.map((module) => new ModuleConfig(module)).sort((a, b) => {
             return a.index - b.index;
         });
     }
@@ -88,15 +52,28 @@ export default class Config {
      * Loads the configuration from the docuflow.config.json file.
      */
     static async load(): Promise<Config> {
-        const configPath = "/docuflow.config.json";
-        const config = await fetch(configPath);
-        const configJson = await config.json();
-
-        return new Config(configJson);
+        // One of two things can happen while loading. Either
+        // (1) the modules.json file exists and we can load it (ie. the modules were automatically generated),
+        // (2) The user specified their own modules in the docuflow.config.ts file and we can load from that instead.
+        const modulesPath = "/modules.json";
+        try {
+            const config = await fetch(modulesPath);
+            const configJson = await config.json();
+            return new Config(configJson.modules);
+        } catch {
+            return new Config(projectConfigOptions.modules || []);
+        }
     }
 
     get projectName(): string {
-        return this.options.projectName;
+        return projectConfigOptions.projectName;
+    }
+
+    /**
+     * Grabs the first file in the first module and returns the path to it.
+     */
+    get defaultPath(): string {
+        return this.createFilePath(this.modules[0], this.modules[0].files[0]);
     }
 
     /**
