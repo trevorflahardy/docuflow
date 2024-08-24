@@ -1,11 +1,4 @@
-import { compile, run } from "@mdx-js/mdx";
-
-import { type Fragment, type Jsx } from "@mdx-js/mdx";
 import React from "react";
-import * as runtime_ from "react/jsx-runtime";
-
-// @ts-expect-error: the automatic react runtime is untyped.
-const runtime: { Fragment: Fragment; jsx: Jsx; jsxs: Jsx } = runtime_;
 
 export interface MDXHeading {
   id: string;
@@ -24,29 +17,6 @@ type ComponentsType = {
 
 const headingLevels = [1, 2, 3, 4, 5, 6];
 
-/**
- * Takes a file path and parses the MDX file at that path into a
- * MDXComponent.
- *
- * @param filePath The file path to parse.
- * @returns The parsed MDX file.
- */
-export async function parseMDX(filePath: string) {
-  // Fetch the requested file path documentation
-  const response = await fetch(`/docs/${filePath}`);
-  const mdxText = await response.text();
-
-  // Compile and run it client side
-  const compiledMdx = await compile(mdxText, {
-    outputFormat: "function-body",
-  });
-  const result = await run(compiledMdx, {
-    ...runtime,
-    baseUrl: "docs/",
-  });
-
-  return result;
-}
 
 function Heading({
   level,
@@ -89,10 +59,9 @@ export interface ParseMDXWithHeadersResult {
 
 export async function parseMDXWithHeaders(filePath: string): Promise<ParseMDXWithHeadersResult> {
   // Parse the MDX file
-  const { default: Content } = await parseMDX(filePath);
+  const { default: Content } = await import(`./public/docs/${filePath}`);
 
   const headings: MDXHeading[] = [];
-
   const components: ComponentsType = headingLevels.reduce((acc, level) => {
     acc[`h${level}`] = (props) => (
       <Heading

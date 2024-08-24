@@ -26,6 +26,7 @@ export default function DynamicDoc({
       const result = await parseMDXWithHeaders(filePath);
       setMDXElement(result.mdx);
       setHeadings(result.headings);
+
     })();
   }, [filePath]);
 
