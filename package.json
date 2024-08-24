@@ -16,7 +16,6 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "eslint": "9.9.1",
-    "eslint-plugin-react-hooks": "4.6.2",
     "eslint-plugin-react-refresh": "0.4.11",
     "fast-glob": "^3.3.2",
     "globals": "^15.9.0",
