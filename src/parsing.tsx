@@ -58,8 +58,9 @@ export interface ParseMDXWithHeadersResult {
 }
 
 export async function parseMDXWithHeaders(filePath: string): Promise<ParseMDXWithHeadersResult> {
-  // Parse the MDX file
-  const { default: Content } = await import(`./public/docs/${filePath}`);
+  // Parse the MDX file. Vite cannot optimize dynamic imports and throws a warning, so we need to
+  // ignore the warning as the importing is easiest to evaluate MDX files on the fly.
+  const { default: Content } = await import(`docs/${filePath}`); /* @vite-ignore */
 
   const headings: MDXHeading[] = [];
   const components: ComponentsType = headingLevels.reduce((acc, level) => {
