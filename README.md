@@ -1,5 +1,6 @@
-# Docuflow
+![Docuflow Banner Welcome](https://github.com/user-attachments/assets/8dc0c3b8-3523-4cc9-9e07-8c68ebb3fb84)
 
+# Docuflow
 Docuflow is a lightweight documentation generator from markdown files. It is designed to be simple and easy to use. It is a single binary that generates a static site from markdown files.
 
 The build time of the site is very fast, as the markdown files are not parsed at build time. Instead, the markdown files are parsed at runtime, and the HTML is cached (or at least, it will be).
@@ -30,12 +31,12 @@ blocks, variables, latex, etc.
 
 ### Development Goals
 
-- [ ] Creating a runnable CLI that injects the relevent docs into the outputted website.
+- [ ] Creating a runnable CLI that injects the relevent docs into the outputted website. Potentially in Python (?)
 - [x] Running and functioning MDX rendering.
 - [x] Auto generated modules.
 - [ ] Project config:
   - [x] A settable website accent color.
   - [ ] Customizable links on the page header (in progress)
- - [ ] A way to add custom pages that aren't documentation-based. 
+ - [ ] A way to add custom pages that aren't documentation-based (?)
 
 ... more will be added here as I go along.
