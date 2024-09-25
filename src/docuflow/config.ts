@@ -1,4 +1,4 @@
-import { ModuleConfigOptions } from "./interfaces";
+import { ModuleConfigOptions, ConfigOptions, LinksOptions } from "./interfaces";
 import projectConfigOptions from '../docuflow.config';
 
 export class ModuleConfig {
@@ -40,12 +40,20 @@ export class ModuleConfig {
 
 export default class Config {
     modules: ModuleConfig[];
+    home: string | undefined;
+    projectDescription: string | undefined;
+    projectName: string | undefined;
+    links: LinksOptions | undefined;
 
-    constructor(modules: ModuleConfigOptions[] = []) {
-        const mods = modules || projectConfigOptions.modules;
+    constructor(options: ConfigOptions) {
+        const mods = options.modules || projectConfigOptions.modules || [];
         this.modules = mods.map((module) => new ModuleConfig(module)).sort((a, b) => {
             return a.index - b.index;
         });
+        this.home = options.home;
+        this.projectDescription = options.projectDescription;
+        this.projectName = options.projectName;
+        this.links = options.links;
     }
 
     /**
@@ -58,16 +66,13 @@ export default class Config {
         const modulesPath = "/modules.json";
         try {
             const config = await fetch(modulesPath);
-            const configJson = await config.json();
-            return new Config(configJson.modules);
+            const configJson = (await config.json()) as ConfigOptions;
+            return new Config(configJson);
         } catch {
-            return new Config(projectConfigOptions.modules || []);
+            return new Config(projectConfigOptions);
         }
     }
 
-    get projectName(): string {
-        return projectConfigOptions.projectName;
-    }
 
     /**
      * Grabs the first file in the first module and returns the path to it.

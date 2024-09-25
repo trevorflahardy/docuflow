@@ -15,5 +15,6 @@
                 "index.mdx"
             ]
         }
-    ]
+    ],
+    "home": "home.mdx"
 }
